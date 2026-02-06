@@ -1,13 +1,18 @@
 import java.io.*;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
+import java.util.*;
 class URL {
 
     String scheme;
     String host;
     String url;
+    Map<String, List<String>> header = new HashMap<>();
     boolean isHTTP;
     String path;
+    String StatusLine;
+    String version, status, explaination;
+    
 
     public URL(String url) {
         String[] splittedURL = url.split("://", 2);
@@ -40,9 +45,44 @@ class URL {
         BufferedReader reader = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
 
         String line;
+
+        String[] headerValues;
+        boolean headers = true;
+        int NumberOfLine = 0;
         while((line = reader.readLine() )!= null){
+            if(NumberOfLine == 0){
+                StatusLine = line;
+            }
+            if(NumberOfLine >0 && headers == true){
+                if(" ".equals(line)) {
+                    headers = false;
+                    continue;
+                }
+                headerValues = line.split(":", 2);
+                if(headerValues.length== 2){
+                    String key = headerValues[0].trim();
+                    String values = headerValues[1].trim();
+                    String[] IndividualValue = values.split(",");
+                    for(String v: IndividualValue){
+                        header.computeIfAbsent(key, k -> new ArrayList<>()).add(v.trim());
+                    }
+                }
+            }
             System.out.println(line);
+            NumberOfLine++;
         }
+        String[] SplittedStatusLine = StatusLine.split(" ", 3);
+        version = SplittedStatusLine[0];
+        status = SplittedStatusLine[1];
+        explaination = SplittedStatusLine[2];
+
+        System.out.println(version);
+        System.out.println(status);
+        System.out.println(explaination);
+
+        header.forEach((key, value) ->{
+            value.forEach(values -> System.out.println(key + ": " + values));
+        });
 
     }
 
