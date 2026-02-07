@@ -1,14 +1,14 @@
+package URLClass;
+import CustomExceptions.*;
 import java.io.*;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
-class URL {
-
+public class URL {
     String scheme;
     String host;
     String url;
     Map<String, List<String>> header = new HashMap<>();
-    boolean isHTTP;
     String path;
     String StatusLine;
     String version, status, explaination;
@@ -18,7 +18,9 @@ class URL {
         String[] splittedURL = url.split("://", 2);
         this.scheme = splittedURL[0];
         this.url = splittedURL[1];
-        this.isHTTP = scheme.equals("http");
+        if(!scheme.equals("http")){
+            throw new NotHTTPException("This browser only supports HTTP");
+        };
         if (!this.url.contains("/")) {
             this.url = this.url + "/";
         }
@@ -54,7 +56,7 @@ class URL {
                 StatusLine = line;
             }
             if(NumberOfLine >0 && headers == true){
-                if(" ".equals(line)) {
+                if(line.isEmpty()) {
                     headers = false;
                     continue;
                 }
@@ -68,7 +70,10 @@ class URL {
                     }
                 }
             }
-            System.out.println(line);
+            else{
+                System.out.println(line);
+
+            }
             NumberOfLine++;
         }
         String[] SplittedStatusLine = StatusLine.split(" ", 3);
@@ -102,11 +107,10 @@ class URL {
         //     for(int i = 0; i<addresses.length; i++){
         //         System.out.println(addresses[i]);
         //     }
-            String url = "https://example.com/";
+            String url = "http://example.com/";
             URL u = new URL(url);
             try {
                 u.request();
-                
 
             } catch (Exception e) {
                 System.out.println(e.getMessage());
