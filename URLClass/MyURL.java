@@ -4,7 +4,7 @@ import java.io.*;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
-public class URL {
+public class MyURL {
     String scheme;
     String host;
     String url;
@@ -12,9 +12,10 @@ public class URL {
     String path;
     String StatusLine;
     String version, status, explaination;
+    String content = "";
     
 
-    public URL(String url) {
+    public MyURL(String url) {
         String[] splittedURL = url.split("://", 2);
         this.scheme = splittedURL[0];
         this.url = splittedURL[1];
@@ -29,7 +30,7 @@ public class URL {
         this.path = "/" + splittedURLHost[1];
     }
 
-    public void request() throws Exception{
+    public String request() throws Exception{
         Socket s = new Socket();
         InetSocketAddress address = new InetSocketAddress(this.host, 80);
         s.connect(address);
@@ -70,12 +71,14 @@ public class URL {
                     }
                 }
             }
-            else{
-                System.out.println(line);
-
+            else if(!headers){
+                content = content + line;
+                // System.out.println(line);
             }
             NumberOfLine++;
         }
+        if(header.containsKey("tranfer-encoding")) throw new TransferEncodingHeaderFoundException("transfer-encoding header found, which is not supported");
+        if(header.containsKey("content-encoding")) throw new ContentEncodingHeaderFoundException("content-encoding header found, which is not supported");
         String[] SplittedStatusLine = StatusLine.split(" ", 3);
         version = SplittedStatusLine[0];
         status = SplittedStatusLine[1];
@@ -88,34 +91,12 @@ public class URL {
         header.forEach((key, value) ->{
             value.forEach(values -> System.out.println(key + ": " + values));
         });
-
+        System.out.println(content);
+        return content;
     }
 
     // public void request(){
     // }
-    public static void main(String[] args) throws UnknownHostException {
-        // String url = "https://gemini.google.com/app/c7d9aebfb849ed2b?utm_source=app_launcher&utm_medium=owned&utm_campaign=base_all";
-        // URL u = new URL(url);
-        // System.out.println(u.scheme);
-        // System.out.println(u.host);
-        // System.out.println(u.path);
-        //     InetAddress Address = InetAddress.getLocalHost();
-        //     System.out.println(Address);
-        //     Address = InetAddress.getByName("www.google.com");
-        //     System.out.println(Address);
-        //     InetAddress addresses[] = InetAddress.getAllByName("www.nba.com");
-        //     for(int i = 0; i<addresses.length; i++){
-        //         System.out.println(addresses[i]);
-        //     }
-            String url = "http://example.com/";
-            URL u = new URL(url);
-            try {
-                u.request();
-
-            } catch (Exception e) {
-                System.out.println(e.getMessage());
-            }
-
-         }
+    
 
     }
