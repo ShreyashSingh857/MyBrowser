@@ -17,7 +17,7 @@ public class Engine{
         //     for(int i = 0; i<addresses.length; i++){
         //         System.out.println(addresses[i]);
         //     }
-            String url = "https://www.google.com/";
+            String url = "http://example.org/";
             MyURL u = new MyURL(url);
             try {
                 String body = u.request();
